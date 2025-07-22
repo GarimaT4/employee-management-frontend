@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department List</title>
+    <link rel="icon" type="image/svg" href="images/dfc.svg" />
+
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #1e90ff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline;
+            margin-bottom: 20px;
+            color: #0056b3;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .add {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .modal {
+    display: none;
+    position: fixed;
+    text-align: center;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+
+        .modal-content {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: right;">
+        <a href="employees.html">EMPLOYEE LIST</a>
+        <a href="designations.html">DESIGNATION LIST</a>
+    </div>
+    <button class="add" onclick="AddDepartment()">ADD DEPARTMENT</button>
+
+    <h1>Department List</h1>
+    <table id="departmentTable" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Department ID</th>
+                <th>Department Name</th>
+                <th>Department Description</th>
+                <th>Status</th>
+                <th>Updated On</th>
+                <th>Actions</th>
+              
+            </tr>
+        </thead>
+        <tbody id="example">
+
+        </tbody>
+    </table>
+
+    <div id="myForm" class="modal">
+        <div class="modal-content">
+        <h3>EDIT DEPARTMENT</h3>
+        <label for="editDeptId">Department ID:</label>
+        <input type="text" id="editDeptId" readonly><br><br>
+        <label for="editDeptName">Department Name:</label>
+        <input type="text" id="editDeptName"><br><br>
+        <label for="editDeptDesc">Department Description:</label>
+        <input type="text" id="editDeptDesc"><br><br>
+        <label for="editStatus"  >Status:</label>
+        <select id="editStatus" >
+            
+            <option value="0">Active</option>
+            <option value="1">Inactive</option>
+        </select><br><br>
+        <button onclick="saveChanges()">Save</button>
+        <button onclick="closeForm()">Cancel</button>
+    </div>
+</div>
+    <br>
+
+    <div id="myForm2" class="modal">
+        <div class="modal-content">
+        <h3>ADD DEPARTMENT</h3>
+        <label for="addDeptName">Department Name:</label>
+        <input type="text" id="addDeptName"><br><br>
+        <label for="addDeptDesc">Department Description:</label>
+        <input type="text" id="addDeptDesc"><br><br>
+        
+        <button onclick="insertDepartment()">Insert</button>
+        <button onclick="closeAddDepartmentForm()">Cancel</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetDepartments",
+                type: "GET",
+                success: function (response) {
+                    if (response && Array.isArray(response.Table)) {
+                        response.Table.forEach(function (dept) {
+
+                            var statusText = dept.status === 0 ? 'Active' : 'Inactive';
+                            var statusClass = dept.status == 0 ? 'status-active' : 'status-inactive';
+                            var formattedDate = '';
+                    if (dept.Date) {
+                        formattedDate = moment(dept.Date).format('DD-MM-YYYY HH:mm:ss');
+                    }
+                            var row = "<tr data-deptcode='" + dept.pkDeptid + "'>" +
+                                "<td class='deptid'>" + dept.pkDeptid + "</td>" +
+                                "<td class='deptname'>" + dept.Dname + "</td>" +
+                                "<td class='deptdesc'>" + dept.DnameDescription + "</td>" +
+                            "<td class='" + statusClass + "' data-status='" + dept.status + "'>" + statusText + "</td>" +
+                                "<td class='updated_on'>" + formattedDate + "</td>" +
+                                "<td><button onclick='getDepartment(\"" + dept.pkDeptid + "\")'>Edit</button></td>" +
+                                "</tr>";
+                            $('#example').append(row);
+                        });
+
+                        $('#departmentTable').DataTable({
+                            dom: 'Bfrtip',
+                            buttons: ['copy', 'csv', 'excel', 'pdf']
+                        });
+                    }
+                }
+            });
+        });
+
+        function getDepartment(deptid) {
+            var row = $("tr[data-deptcode='" + deptid + "']");
+            var deptID = row.find('.deptid').text();
+            var deptName = row.find('.deptname').text();
+            var deptDesc = row.find('.deptdesc').text();
+            var status = row.find('td[data-status]').data('status'); 
+
+            $('#editDeptId').val(deptID);
+            $('#editDeptName').val(deptName);
+            $('#editDeptDesc').val(deptDesc);
+            $('#editStatus').val(status);
+            $("#myForm").css("display", "block");
+        }
+
+        function saveChanges() {
+            var deptID = $('#editDeptId').val();
+            var deptName = $('#editDeptName').val();
+            var deptDesc = $('#editDeptDesc').val();
+            var status = $('#editStatus').val();
+            var row = $("tr[data-deptcode='" + deptID + "']");
+            row.find('.deptname').text(deptName);
+            row.find('.deptdesc').text(deptDesc);
+            row.find('td[data-status]').attr('data-status', status)
+
+            $("#myForm").css("display", "none");
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/UpdateDepartment/" + deptID + "/" + deptName + "/" + deptDesc + "/" + status,
+                type: "POST",
+                success: function (response) {
+                   
+                        location.reload();
+                        alert("Department updated successfully");
+                        
+                    
+                }
+            });
+        }
+
+        function insertDepartment() {
+            var deptName = $('#addDeptName').val();
+            var deptDesc = $('#addDeptDesc').val();
+            if (!deptName) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            $("#myForm2").css("display", "none");
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/AddDepartment/" + deptName + "/" + deptDesc,
+                type: "POST",
+                success: function (response) {
+                   alert( "Department added successfully");
+                    location.reload();
+                    console.log("Department added successfully", response);
+                }
+            });
+        }
+
+        function closeForm() {
+            $("#myForm").css("display", "none");
+        }
+
+        function AddDepartment() {
+    $("#myForm2").css("display", "block");
+}
+
+
+        function closeAddDepartmentForm() {
+            $("#myForm2").css("display", "none");
+        }
+    </script>
+</body>
+
+</html>
