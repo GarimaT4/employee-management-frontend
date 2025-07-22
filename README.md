@@ -35,4 +35,4 @@ This is a simple web-based Employee Management System built using **HTML, CSS, J
 - MS SQL Server (Database)
 
 ### Live Demo
-[Click here to view the live site](https://garima-tyagi.github.io/employee-management/)
+[Click here to view the live site](https://garimat4.github.io/employee-management-frontend/)
