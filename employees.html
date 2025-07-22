@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee List</title>
+    <link rel="icon" type="image/svg" href="images/dfc.svg" />
+
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #1e90ff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline;
+            margin-bottom: 20px;
+            color: #0056b3;
+            text-decoration: none;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .add {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            text-align: center;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 20px;
+            width: 450px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .photo {
+            margin: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .photo img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: right;">
+        <a href="departments.html">DEPARTMENT LIST</a>
+        <a href="designations.html">DESIGNATION LIST</a>
+    </div>
+    <button class="add" onclick="AddEmployee()">ADD EMPLOYEE</button>
+    <h1>Employee List</h1>
+    <table id="employeeTable" class="display nowrap" style="width:100%">
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Employee ID</th>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Basic Salary</th>
+                <th>Status</th>
+                <th>Updated On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="example">
+            <!-- Employee data will be appended here -->
+        </tbody>
+    </table>
+
+    <div id="myForm" class="modal">
+        <div class="modal-content">
+            <h3>EDIT EMPLOYEE</h3><br>
+            <label for="editEmpCode">Employee Code:</label>
+            <input type="text" id="editEmpCode" readonly><br><br>
+            <label for="editEmployeeName">Employee Name:</label>
+            <input type="text" id="editEmployeeName"><br><br>
+            <label for="editDept">Department:</label>
+            <select id="editDept"></select>
+            <label for="editDesig" style="margin-left:20px">Designation:</label>
+            <select id="editDesig"></select><br><br>
+            <label for="editBasicSalary">Basic Salary:</label>
+            <input type="text" id="editBasicSalary"><br><br>
+            <label for="editStatus">Status:</label>
+            <select id="editStatus">
+
+                <option value="0">Active</option>
+                <option value="1">Inactive</option>
+            </select><br><br>
+            <label for="editEmpPhoto">Upload New Photo:</label>
+            <input type="file" id="editEmpPhoto" name="file"><br><br>
+            <button onclick="saveChanges()">Save</button>
+            <button onclick="closeForm()">Cancel</button>
+        </div>
+
+    </div>
+    <div id="myForm2" class="modal">
+        <div class="modal-content">
+            <h3>ADD EMPLOYEE</h3><br>
+            <label for="addEmpCode">Employee Code:</label>
+            <input type="number" id="addEmpCode"><br><br>
+            <label for="addEmployeeName">Employee Name:</label>
+            <input type="text" id="addEmployeeName"><br><br>
+            <label for="addDept">Department:</label>
+            <select id="addDept"></select>
+            <label for="addDesig" style="margin-left:20px">Designation:</label>
+            <select id="addDesig"></select><br><br>
+
+            <label for="addBasicSalary">Basic Salary:</label>
+            <input type="text" id="addBasicSalary"><br><br>
+
+
+            Upload Image:<input type="file" id="empPhoto" name="file" value="Upload Photo">
+            <br><br>
+            <button onclick="insertEmployee()">Insert</button>
+            <button onclick="closeAddEmployeeForm()">Cancel</button>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetEmployees",
+                type: "GET",
+                success: function (response) {
+                    if (response && Array.isArray(response.Table)) {
+                        response.Table.forEach(function (emp) {
+
+                            var formattedDate = '';
+                            if (emp.Date) {
+                                formattedDate = moment(emp.Date).format('DD-MM-YYYY HH:mm:ss');
+                            }
+                            var statusText = emp.status === 0 ? 'Active' : 'Inactive';
+                            var statusClass = emp.status == 0 ? 'status-active' : 'status-inactive';
+                            var photoUrl = emp.filename ? emp.filename : 'photoicon.jpg'
+                            var row = "<tr data-empcode='" + emp.Empcode + "'>" +
+                                "<td class='photo'><img src='" + photoUrl + "' alt='Photo' width='50' height='50'></td>" +
+                                "<td class='empid'>" + emp.pkEmpid + "</td>" +
+                                "<td class='empcode'>" + emp.Empcode + "</td>" +
+                                "<td class='empname'>" + emp.Empname + "</td>" +
+                                "<td class='department'>" + emp.DeptName + "</td>" +
+                                "<td class='designation'>" + emp.Desig + "</td>" +
+                                "<td class='salary'>" + emp.basicsalary + "</td>" +
+                                "<td class='" + statusClass + "' data-status='" + emp.status + "'>" + statusText + "</td>" +
+                                "<td class='updated_on'>" + formattedDate + "</td>" +
+                                "<td><button onclick='getEmployee(\"" + emp.Empcode + "\")'>Edit</button></td>" +
+                                "</tr>"; console.log('Creating row for Empcode:', emp.Empcode);
+                            console.log('Status:', emp.status);
+                            $('#example').append(row);
+                        });
+
+                        $('#employeeTable').DataTable({
+                            dom: 'Bfrtip',
+                            buttons: [
+                                {
+                                    extend: 'copy',
+                                    exportOptions: {
+                                        columns: ':visible:not(:last-child)',
+                                        format: {
+                                            body: function (data, row, column, node) {
+                                                return $(data).find('img').length > 0 ? $(data).find('img').attr('src') : data;
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    extend: 'csv',
+                                    exportOptions: {
+                                        columns: ':visible:not(:last-child)',
+                                        format: {
+                                            body: function (data, row, column, node) {
+                                                return $(data).find('img').length > 0 ? $(data).find('img').attr('src') : data;
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    extend: 'excel',
+                                    exportOptions: {
+                                        columns: ':visible:not(:last-child)',
+                                        format: {
+                                            body: function (data, row, column, node) {
+                                                return $(data).find('img').length > 0 ? $(data).find('img').attr('src') : data;
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    extend: 'print',
+                                    exportOptions: {
+                                        columns: ':visible:not(:last-child)',
+                                        format: {
+                                            body: function (data, row, column, node) {
+                                                return $(data).find('img').length > 0 ? $(data).find('img').attr('src') : data;
+                                            }
+                                        }
+                                    },
+                                    customize: function (win) {
+                                        $(win.document.body)
+                                            .css('font-size', '10pt')
+                                            .prepend('<h3 style="text-align:center;">Employee List</h3>');
+                                        $(win.document.body).find('table')
+                                            .addClass('compact')
+                                            .css({
+                                                'width': '100%',
+                                                'font-size': '10pt',
+                                                'white-space': 'nowrap'
+                                            });
+                                        // Force landscape print
+                                        $(win.document.head).append('<style>@page { size: landscape; }</style>');
+                                    }
+                                }
+                            ]
+
+                        });
+
+                    }
+                }
+            });
+        });
+
+        function getEmployee(ecode) {
+            var row = $("tr[data-empcode='" + ecode + "']");
+            var empCode = row.find('.empcode').text();
+            var empName = row.find('.empname').text();
+            var Dept = row.find('.department').text();
+            var Desig = row.find('.designation').text();
+            var BasicSalary = row.find('.salary').text();
+            var Status = row.find('td[data-status]').data('status'); // Fetch status from data attribute
+
+            console.log('Getting employee details for Empcode:', empCode);
+            console.log('Status retrieved:', Status);
+
+            $('#editEmpCode').val(empCode);
+            $('#editEmployeeName').val(empName);
+            $('#editDept').val(Dept);
+            $('#editDesig').val(Desig);
+            $('#editBasicSalary').val(BasicSalary);
+            $('#editStatus').val(Status);
+            $("#myForm").css("display", "block");
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetDepartments",
+                type: "GET",
+                success: function (response) {
+                    $('#editDept').empty();
+                    response.Table.forEach(function (Dept) {
+                        var option = $("<option></option>")
+                            .val(Dept.pkDeptid)
+                            .text(Dept.Dname);
+                        $('#editDept').append(option);
+                    });
+                }
+            });
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetDesignations",
+                type: "GET",
+                success: function (response) {
+                    $('#editDesig').empty();
+                    response.Table.forEach(function (Desig) {
+                        var option = $("<option></option>")
+                            .val(Desig.pkDesigId)
+                            .text(Desig.DesigName);
+                        $('#editDesig').append(option);
+                    });
+                }
+            });
+
+        }
+        function saveChanges() {
+            var empCode = $('#editEmpCode').val();
+            var empName = $('#editEmployeeName').val();
+            var Dept = $('#editDept').val();
+            var Desig = $('#editDesig').val();
+            var BasicSalary = $('#editBasicSalary').val();
+            var Status = $('#editStatus').val();
+            var row = $("tr[data-empcode='" + empCode + "']");
+            var empId = row.find('.empid').text();
+            var currentPhoto = row.find('.photo img').attr('src');
+
+
+            $("#myForm").css("display", "none");
+
+
+            var formData = new FormData();
+            formData.append("pkEmpid", empId);
+            formData.append("Empcode", empCode);
+            formData.append("Empname", empName);
+            formData.append("fkDeptid", Dept);
+            formData.append("fkDesigId", Desig);
+            formData.append("BasicSal", BasicSalary);
+            formData.append("Status", Status);
+
+
+            var fileInput = document.getElementById('editEmpPhoto');
+            if (fileInput.files.length > 0) {
+                formData.append("filename", fileInput.files[0]);
+            } else {
+
+                formData.append("filename", currentPhoto);
+            }
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/UpdateEmployee",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert("Employee updated successfully.");
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert("Failed to update employee. Please try again.");
+                    console.error("Error updating employee:", error);
+                }
+            });
+        }
+
+        function insertEmployee() {
+            var filename = $('#empPhoto').val().split('\\').pop();
+            var empcode = $("#addEmpCode").val().trim();
+
+
+            if (!empcode.startsWith("E")) {
+                empcode = "E" + empcode;
+            }
+
+            var empName = $('#addEmployeeName').val();
+            var DeptId = $('#addDept').val();
+            var Desig = $('#addDesig').val();
+            var BasicSalary = $('#addBasicSalary').val();
+            var photo = $('#empPhoto')[0].files[0];
+
+
+            if (!DeptId || !Desig || !empcode || !empName || !BasicSalary) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+
+            $("#myForm2").css("display", "none");
+
+            var formData = new FormData();
+            formData.append('ECode', empcode);
+            formData.append('Ename', empName);
+            formData.append('Deptid', DeptId);
+            formData.append('Desigid', Desig);
+            formData.append('BasicSal', BasicSalary);
+            formData.append('Status', 0);
+
+            if (photo) {
+                formData.append('file', photo);
+            }
+            else {
+
+                var defaultPhoto = new File([], 'photoicon.jpg');
+                formData.append('file', defaultPhoto);
+            }
+            $.ajax({
+                url: 'https://dfccil-api.azurewebsites.net/api/AddEmployee',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.message === "Employee added successfully") {
+                        alert("Employee added successfully.");
+                        location.reload();
+                    } else {
+                        alert("Employee cannot be added.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error adding employee:", xhr.responseText);
+                }
+            });
+        }
+
+
+        function closeForm() {
+            $("#myForm").css("display", "none");
+        }
+
+        function AddEmployee() {
+            $("#myForm2").css("display", "block");
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetDepartments",
+                type: "GET",
+                success: function (response) {
+                    $('#addDept').empty();
+                    var option = $("<option></option>")
+                        .val("")
+                        .text("Select Dept.");
+                    $('#addDept').append(option);
+                    response.Table.forEach(function (Dept) {
+                        if (Dept.status === 0) {
+                            var option = $("<option></option>")
+                                .val(Dept.pkDeptid)
+                                .text(Dept.Dname);
+                            $('#addDept').append(option);
+                        }
+                    });
+                }
+            });
+
+            $.ajax({
+                url: "https://dfccil-api.azurewebsites.net/api/GetDesignations",
+                type: "GET",
+                success: function (response) {
+                    $('#addDesig').empty();
+                    var option = $("<option></option>")
+                        .val("")
+                        .text("Select Desig.");
+                    $('#addDesig').append(option);
+                    response.Table.forEach(function (Desig) {
+                        if (Desig.status === 0) {
+                            var option = $("<option></option>")
+                                .val(Desig.pkDesigId)
+                                .text(Desig.DesigName);
+                            $('#addDesig').append(option);
+                        }
+                    });
+                }
+            });
+        }
+
+        function closeAddEmployeeForm() {
+            $("#myForm2").css("display", "none");
+        }
+
+
+    </script>
+</body>
+
+</html>
