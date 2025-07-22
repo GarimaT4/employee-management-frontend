@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <link rel="icon" type="image/svg" href="images/dfc.svg" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f8ff, #cfe8ff);
+            color: #333;
+            text-align: center;
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1e90ff;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #0066cc, #0056b3);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        a:hover {
+            background: linear-gradient(90deg, #0056b3, #004799);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero">
+        <h1>Employee Management System</h1>
+        <p>Manage employees, departments, and designations with ease.</p>
+        <div class="btn-container">
+            <a href="employees.html">Employees</a>
+            <a href="departments.html">Departments</a>
+            <a href="designations.html">Designations</a>
+        </div>
+    </div>
+    <footer>© 2025 Employee Management System</footer>
+</body>
+
+</html>
